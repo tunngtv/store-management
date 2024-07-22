@@ -71,11 +71,11 @@ class PostController extends BaseController
      */
     public function show($id): JsonResponse
     {
-        $post = Post::findOrFail($id);
-
-        if ($post) {
+        try {
+            $post = Post::findOrFail($id);
             return $this->sendSuccessResponse(new PostResource($post), 'Post retrieved successfully.');
-        } else {
+        } catch (\Throwable $e) {
+            Log::error($e);
             return $this->sendErrorResponse('Post not found.', 404);
         }
     }
@@ -91,16 +91,30 @@ class PostController extends BaseController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Post $post)
+    public function update(StorePostRequest $request, Post $post): JsonResponse
     {
-        //
+        try {
+            // Update the post using validated data
+            $post->update($request->validated());
+            return $this->sendSuccessResponse(new PostResource($post), 'Post updated successfully.');
+        } catch (\Throwable $e) {
+            Log::error($e);
+            return $this->sendErrorResponse('An error occurred while updating the post.');
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Post $post)
+    public function destroy($id): JsonResponse
     {
-        //
+        try {
+            $post = Post::findOrFail($id);
+            $post->delete();
+            return $this->sendSuccessResponse([], 'Post deleted successfully.');
+        } catch (\Throwable $e) {
+            Log::error($e);
+            return $this->sendErrorResponse('Post not found.', 404);
+        }
     }
 }
