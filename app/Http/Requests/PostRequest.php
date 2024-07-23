@@ -7,7 +7,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StorePostRequest extends FormRequest
+class PostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,6 +28,7 @@ class StorePostRequest extends FormRequest
             'title' => 'required',
             'content' => 'required',
             'author_id' => ['required', 'exists:users,id'],
+            'category_id' => ['required', 'exists:categories,id'],
         ];
     }
 
@@ -43,6 +44,8 @@ class StorePostRequest extends FormRequest
             'content.required' => 'The content is required',
             'author_id.required' => 'The author is required',
             'author_id.exists' => 'The author doest not exist',
+            'category_id.required' => 'The category is required',
+            'category_id.exists' => 'The category doest not exist',
         ];
     }
 

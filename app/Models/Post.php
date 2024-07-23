@@ -20,11 +20,12 @@ class Post extends Model
      */
     protected $fillable = [
         'author_id',
+        'category_id',
         'title',
         'content',
         'posted_at',
         'slug',
-        'thumbnail_id'
+        'thumbnail_id',
     ];
 
     /**
@@ -36,16 +37,16 @@ class Post extends Model
          'posted_at' => 'datetime'
     ];
 
-    public static function create(mixed $validated)
-    {
-        //
-    }
-
     /**
      * Get the user that owns the post
      */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'author_id', 'id',);
+    }
+
+    public function categories(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'category_id', 'id',);
     }
 }

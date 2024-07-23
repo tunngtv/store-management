@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\BaseController;
-use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 use Illuminate\Http\JsonResponse;
@@ -54,7 +54,7 @@ class PostController extends BaseController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StorePostRequest $request): JsonResponse
+    public function store(PostRequest $request): JsonResponse
     {
         try {
             // Create the post using validated data
@@ -91,7 +91,7 @@ class PostController extends BaseController
     /**
      * Update the specified resource in storage.
      */
-    public function update(StorePostRequest $request, Post $post): JsonResponse
+    public function update(PostRequest $request, Post $post): JsonResponse
     {
         try {
             // Update the post using validated data
