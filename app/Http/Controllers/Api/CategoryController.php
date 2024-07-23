@@ -51,9 +51,15 @@ class CategoryController extends BaseController
     /**
      * Display the specified resource.
      */
-    public function show(Category $category)
+    public function show($id): JsonResponse
     {
-        //
+        try {
+            $category = Category::findOrFail($id);
+            return $this->sendSuccessResponse(new CategoryResource($category), 'Category retrieved successfully');
+        } catch (\Throwable $e) {
+            Log::error($e);
+            return $this->sendErrorResponse('Category not found', 404);
+        }
     }
 
     /**
