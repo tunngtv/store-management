@@ -54,7 +54,7 @@ class CategoryRequest extends FormRequest
         $messages = $validator->errors()->all();
 
         if (!count($messages) || !is_string($messages[0])) {
-            return $validator->getTranslator()->get('The given data was invalid.');
+            return trans('The given data was invalid.');
         }
 
         $message = array_shift($messages);
@@ -62,7 +62,7 @@ class CategoryRequest extends FormRequest
         if ($count = count($messages)) {
             $pluralized = $count === 1 ? 'error' : 'errors';
 
-            $message .= ' ' . $validator->getTranslator()->choice("(and :count more $pluralized)", $count, compact('count'));
+            $message .= ' ' . trans_choice("(and :count more $pluralized)", $count, ['count' => $count]);
         }
 
         return $message;
