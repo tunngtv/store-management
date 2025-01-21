@@ -3,11 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Exceptions\HttpResponseException;
+use App\Http\Requests\BaseRequest;
 
-class CategoryRequest extends FormRequest
+class CategoryRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -41,45 +39,5 @@ class CategoryRequest extends FormRequest
             'name.required' => 'The category name is required',
             'slug.required' => 'The slug is required',
         ];
-    }
-
-    /**
-     * Create an error message summary from the validation errors.
-     *
-     * @param Validator $validator
-     * @return string
-     */
-    protected static function summarize(Validator $validator): string
-    {
-        $messages = $validator->errors()->all();
-
-        if (!count($messages) || !is_string($messages[0])) {
-            return trans('The given data was invalid.');
-        }
-
-        $message = array_shift($messages);
-
-        if ($count = count($messages)) {
-            $pluralized = $count === 1 ? 'error' : 'errors';
-
-            $message .= ' ' . trans_choice("(and :count more $pluralized)", $count, ['count' => $count]);
-        }
-
-        return $message;
-    }
-
-    protected function failedValidation(Validator $validator): void
-    {
-        if ($this->expectsJson()) {
-            $response = response()->json([
-                'status' => false,
-                'message' => $this->summarize($validator),
-                'errors' => $validator->errors()
-            ], 422);
-
-            throw new HttpResponseException($response);
-        }
-
-        parent::failedValidation($validator);
     }
 }
