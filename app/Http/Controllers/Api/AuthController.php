@@ -30,11 +30,11 @@ class AuthController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        $user = new User;
-        $user->name = request('name');
-        $user->email = request('email');
-        $user->password = bcrypt(request('password'));
-        $user->save();
+        $user = User::create([
+            'name' => request('name'),
+            'email' => request('email'),
+            'password' => bcrypt(request('password')),
+        ]);
 
         return response()->json($user, 201);
     }
@@ -65,7 +65,7 @@ class AuthController extends Controller
     // Profile API - GET (JWT Auth Token)
     public function profile(): JsonResponse
     {
-        $userData = auth()->user();
+        $userData = Auth::user();
 
         return response()->json([
             "status" => true,
@@ -96,7 +96,7 @@ class AuthController extends Controller
      * Get the token array structure.
      *
      * @param string $token
-     * @param null $user
+     * @param mixed $user
      * @return JsonResponse
      */
     protected function respondWithToken(string $token, $user = null): JsonResponse
