@@ -1,5 +1,7 @@
 import { Head } from "@inertiajs/react";
-import { ReactNode } from "react";
+import Box from "@mui/material/Box";
+import CssBaseline from "@mui/material/CssBaseline";
+import { Fragment, ReactNode } from "react";
 
 type Props = {
     title: string;
@@ -8,9 +10,10 @@ type Props = {
 
 export const MainLayout: React.FC<Props> = ({ title, children }) => {
     return (
-        <div className="container mx-auto">
+        <Fragment>
             <Head title={title} />
+            <CssBaseline />
             {children}
-        </div>
+        </Fragment>
     );
 };
