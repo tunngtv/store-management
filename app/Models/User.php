@@ -8,9 +8,6 @@ use Illuminate\Foundation\Auth\User as Authentication;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 
-/**
- * @mixin IdeHelperUser
- */
 class User extends Authentication implements JWTSubject
 {
     use HasFactory, Notifiable;
@@ -21,9 +18,16 @@ class User extends Authentication implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'birth_date',
+        'gender',
+        'status',
         'email',
+        'email_verified_at',
+        'phone',
         'password',
+        'trial_ends_at',
     ];
 
     /**
@@ -48,6 +52,8 @@ class User extends Authentication implements JWTSubject
             'password' => 'hashed',
         ];
     }
+
+    public const ADMIN_EMAIL = 'tungtv@store.com';
 
     /**
      * Get the post associated with the user
