@@ -1,7 +1,8 @@
 import { Head } from "@inertiajs/react";
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
-import { Fragment, ReactNode } from "react";
+import { ReactNode } from "react";
+
+import { ThemeProvider } from "@/context/ThemeContext";
+import AppLayout from "./AppLayout";
 
 type Props = {
     title: string;
@@ -10,10 +11,9 @@ type Props = {
 
 export const MainLayout: React.FC<Props> = ({ title, children }) => {
     return (
-        <Fragment>
+        <ThemeProvider>
             <Head title={title} />
-            <CssBaseline />
-            {children}
-        </Fragment>
+            <AppLayout />
+        </ThemeProvider>
     );
 };

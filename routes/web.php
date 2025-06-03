@@ -6,3 +6,6 @@ use App\Http\Controllers\Main\IndexController;
 Route::controller(IndexController::class)->group(function () {
     Route::get('/', 'index');
 });
+
+
+require __DIR__ . '/auth.php';
