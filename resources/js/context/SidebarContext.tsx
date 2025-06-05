@@ -63,7 +63,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     return (
-        <SidebarContext.Provider
+        <SidebarContext
             value={{
                 isExpanded: isMobile ? false : isExpanded,
                 isMobileOpen,
@@ -78,6 +78,6 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
             }}
         >
             {children}
-        </SidebarContext.Provider>
+        </SidebarContext>
     );
 };
