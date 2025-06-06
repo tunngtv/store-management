@@ -16,13 +16,13 @@ class Authenticated
      */
     public function handle(Request $request, Closure $next): Response
     {
-         if (!Auth::check()) {
-             return response()->json([
-                 'status' => false,
-                 'message' => 'This action is unauthorized.'
-             ], 401);
-         }
+        if (!Auth::check()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'This action is unauthorized.'
+            ], 401);
+        }
 
-         return $next($request);
+        return $next($request);
     }
 }

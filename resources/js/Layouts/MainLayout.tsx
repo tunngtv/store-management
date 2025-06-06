@@ -1,7 +1,5 @@
 import { Head } from "@inertiajs/react";
 import { ReactNode } from "react";
-
-import { ThemeProvider } from "@/context/ThemeContext";
 import AppLayout from "./AppLayout";
 
 type Props = {
@@ -11,9 +9,9 @@ type Props = {
 
 export const MainLayout: React.FC<Props> = ({ title, children }) => {
     return (
-        <ThemeProvider>
+        <>
             <Head title={title} />
             <AppLayout />
-        </ThemeProvider>
+        </>
     );
 };

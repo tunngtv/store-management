@@ -21,6 +21,7 @@ createInertiaApp({
 
         if (import.meta.env.SSR) {
             hydrateRoot(el, appElement);
+            return;
         }
 
         createRoot(el).render(appElement);
