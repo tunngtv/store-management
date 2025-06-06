@@ -1,6 +1,7 @@
-import { hydrateRoot } from "react-dom/client";
+import { createRoot, hydrateRoot } from "react-dom/client";
 import { createInertiaApp } from "@inertiajs/react";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
+import { ThemeProvider } from "./context/ThemeContext";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -12,6 +13,16 @@ createInertiaApp({
             import.meta.glob("./pages/**/*.tsx")
         ),
     setup({ el, App, props }) {
-        hydrateRoot(el, <App {...props} />);
+        const appElement = (
+            <ThemeProvider>
+                <App {...props} />
+            </ThemeProvider>
+        );
+
+        if (import.meta.env.SSR) {
+            hydrateRoot(el, appElement);
+        }
+
+        createRoot(el).render(appElement);
     },
 });
