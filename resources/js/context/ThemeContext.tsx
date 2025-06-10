@@ -1,51 +1,81 @@
-// "use client";
+import {
+    createContext,
+    useState,
+    useContext,
+    useEffect,
+    ReactNode,
+    FC,
+} from "react";
 
-import type React from "react";
-import { createContext, useState, useContext, useEffect } from "react";
+type Theme = "light" | "dark" | "system";
 
-type Theme = "light" | "dark";
-
-type ThemeContextType = {
-    theme: Theme;
-    toggleTheme: () => void;
+type ThemeProviderProps = {
+    children: ReactNode;
+    defaultTheme?: Theme;
+    storageKey?: string;
 };
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+type ThemeProviderState = {
+    theme: Theme;
+    toggleTheme: (theme: Theme) => void;
+};
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
+const initialState: ThemeProviderState = {
+    theme: "system",
+    toggleTheme: () => null,
+};
+
+const ThemeContext = createContext<ThemeProviderState>(initialState);
+
+export const ThemeProvider: FC<ThemeProviderProps> = ({
     children,
+    defaultTheme = "system",
+    storageKey = "iut",
+    ...props
 }) => {
-    const [theme, setTheme] = useState<Theme>("light");
-    const [isInitialized, setIsInitialized] = useState(false);
+    const [theme, setTheme] = useState<Theme>(() => {
+        if (typeof window !== "undefined") {
+            const savedTheme = localStorage.getItem(storageKey) as Theme | null;
+            return savedTheme || defaultTheme; // Default to 'system' if no saved theme
+        }
+
+        return defaultTheme; // Fallback for server-side rendering
+    });
 
     useEffect(() => {
         // This code will only run on the client side
-        const savedTheme = localStorage.getItem("theme") as Theme | null;
-        const initialTheme = savedTheme || "light"; // Default to light theme
+        if (typeof window !== "undefined") {
+            const root = window.document.documentElement;
 
-        setTheme(initialTheme);
-        setIsInitialized(true);
-    }, []);
+            root.classList.remove("light", "dark");
 
-    useEffect(() => {
-        if (isInitialized) {
-            localStorage.setItem("theme", theme);
-            if (theme === "dark") {
-                document.documentElement.classList.add("dark");
-            } else {
-                document.documentElement.classList.remove("dark");
+            if (theme === "system") {
+                const systemTheme = window.matchMedia(
+                    "(prefers-color-scheme: dark)"
+                ).matches
+                    ? "dark"
+                    : "light";
+
+                root.classList.add(systemTheme);
+                return;
             }
-        }
-    }, [theme, isInitialized]);
 
-    const toggleTheme = () => {
-        setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+            root.classList.add(theme);
+        }
+    }, [theme]);
+
+    const value = {
+        theme,
+        toggleTheme: (theme: Theme) => {
+            if (typeof window !== "undefined") {
+                localStorage.setItem(storageKey, theme);
+            }
+            setTheme(theme);
+        },
     };
 
     return (
-        <ThemeContext value={{ theme, toggleTheme }}>
-            {children}
-        </ThemeContext>
+        <ThemeContext {...props} value={value}>{children}</ThemeContext>
     );
 };
 
