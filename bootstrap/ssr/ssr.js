@@ -18,7 +18,7 @@ createServer(
     render: ReactDOMServer.renderToString,
     resolve: (name) => resolvePageComponent(
       `./pages/${name}.tsx`,
-      /* @__PURE__ */ Object.assign({ "./pages/Auth/SignIn.tsx": () => import("./assets/SignIn-Cnu0ZWWV.js"), "./pages/Index/Main.tsx": () => import("./assets/Main-CghsDlOn.js") })
+      /* @__PURE__ */ Object.assign({ "./pages/Auth/SignIn.tsx": () => import("./assets/SignIn-DCcc_0is.js"), "./pages/Index/Main.tsx": () => import("./assets/Main-Cn9Anio0.js") })
     ),
     setup: ({ App, props }) => /* @__PURE__ */ jsx(App, { ...props })
   })

@@ -1,15 +1,48 @@
 import { useState } from "react";
-// import { Link } from "react-router";
-import { Link } from "@inertiajs/react";
+import { Link, useForm } from "@inertiajs/react";
 import { ChevronLeftIcon, EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/Checkbox";
 import Button from "../ui/button/Button";
 
-export default function SignInForm() {
+type SignInFormProps = {
+    status: string;
+    canResetPassword: boolean;
+};
+
+type UseFormType = {
+    email: string;
+    password: string;
+    remember?: boolean;
+};
+
+export default function SignInForm({
+    status,
+    canResetPassword,
+}: SignInFormProps) {
+    // Initialize the form with useForm hook from Inertia.js
+    const { data, setData, post, processing, errors, reset } =
+        useForm<UseFormType>();
     const [showPassword, setShowPassword] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
+
+    const disableButton = processing || !data.email || !data.password;
+
+    const handleLogin = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        post("/auth/signin", {
+            onSuccess: () => {
+                reset();
+                setIsChecked(false);
+            },
+            onError: () => {
+                // Handle error if needed
+                alert("Login failed. Please check your credentials.");
+            },
+        });
+    };
+
     return (
         <div className="flex flex-col flex-1">
             <div className="w-full max-w-md pt-10 mx-auto">
@@ -84,7 +117,7 @@ export default function SignInForm() {
                                 </span>
                             </div>
                         </div>
-                        <form>
+                        <form onSubmit={(e) => handleLogin(e)}>
                             <div className="space-y-6">
                                 <div>
                                     <Label>
@@ -93,7 +126,14 @@ export default function SignInForm() {
                                             *
                                         </span>{" "}
                                     </Label>
-                                    <Input placeholder="info@gmail.com" />
+                                    <Input
+                                        name="email"
+                                        placeholder="info@gmail.com"
+                                        value={data.email}
+                                        onChange={(e) => {
+                                            setData("email", e.target.value);
+                                        }}
+                                    />
                                 </div>
                                 <div>
                                     <Label>
@@ -104,12 +144,20 @@ export default function SignInForm() {
                                     </Label>
                                     <div className="relative">
                                         <Input
+                                            name="password"
                                             type={
                                                 showPassword
                                                     ? "text"
                                                     : "password"
                                             }
                                             placeholder="Enter your password"
+                                            value={data.password}
+                                            onChange={(e) => {
+                                                setData(
+                                                    "password",
+                                                    e.target.value
+                                                );
+                                            }}
                                         />
                                         <span
                                             onClick={() =>
@@ -136,14 +184,18 @@ export default function SignInForm() {
                                         </span>
                                     </div>
                                     <Link
-                                        href="/reset-password"
+                                        href="/auth/reset-password"
                                         className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                                     >
                                         Forgot password?
                                     </Link>
                                 </div>
                                 <div>
-                                    <Button className="w-full" size="sm">
+                                    <Button
+                                        className="w-full"
+                                        size="sm"
+                                        disabled={disableButton}
+                                    >
                                         Sign in
                                     </Button>
                                 </div>
@@ -154,7 +206,7 @@ export default function SignInForm() {
                             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                                 Don&apos;t have an account? {""}
                                 <Link
-                                    href="/signup"
+                                    href="/auth/signup"
                                     className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
                                 >
                                     Sign Up

@@ -1,5 +1,5 @@
 import { jsx, jsxs, Fragment } from "react/jsx-runtime";
-import { Link, Head } from "@inertiajs/react";
+import { useForm, Link, Head } from "@inertiajs/react";
 import * as React from "react";
 import { useState } from "react";
 import { twMerge } from "tailwind-merge";
@@ -181,9 +181,26 @@ const Button = ({
     }
   );
 };
-function SignInForm() {
+function SignInForm({
+  status,
+  canResetPassword
+}) {
+  const { data, setData, post, processing, errors, reset } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+  const disableButton = processing || !data.email || !data.password;
+  const handleLogin = (event) => {
+    event.preventDefault();
+    post("/auth/signin", {
+      onSuccess: () => {
+        reset();
+        setIsChecked(false);
+      },
+      onError: () => {
+        alert("Login failed. Please check your credentials.");
+      }
+    });
+  };
   return /* @__PURE__ */ jsxs("div", { className: "flex flex-col flex-1", children: [
     /* @__PURE__ */ jsx("div", { className: "w-full max-w-md pt-10 mx-auto", children: /* @__PURE__ */ jsxs(
       Link,
@@ -266,7 +283,7 @@ function SignInForm() {
           /* @__PURE__ */ jsx("div", { className: "absolute inset-0 flex items-center", children: /* @__PURE__ */ jsx("div", { className: "w-full border-t border-gray-200 dark:border-gray-800" }) }),
           /* @__PURE__ */ jsx("div", { className: "relative flex justify-center text-sm", children: /* @__PURE__ */ jsx("span", { className: "p-2 text-gray-400 bg-white dark:bg-gray-900 sm:px-5 sm:py-2", children: "Or" }) })
         ] }),
-        /* @__PURE__ */ jsx("form", { children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
+        /* @__PURE__ */ jsx("form", { onSubmit: (e) => handleLogin(e), children: /* @__PURE__ */ jsxs("div", { className: "space-y-6", children: [
           /* @__PURE__ */ jsxs("div", { children: [
             /* @__PURE__ */ jsxs(Label, { children: [
               "Email",
@@ -274,7 +291,17 @@ function SignInForm() {
               /* @__PURE__ */ jsx("span", { className: "text-error-500", children: "*" }),
               " "
             ] }),
-            /* @__PURE__ */ jsx(Input, { placeholder: "info@gmail.com" })
+            /* @__PURE__ */ jsx(
+              Input,
+              {
+                name: "email",
+                placeholder: "info@gmail.com",
+                value: data.email,
+                onChange: (e) => {
+                  setData("email", e.target.value);
+                }
+              }
+            )
           ] }),
           /* @__PURE__ */ jsxs("div", { children: [
             /* @__PURE__ */ jsxs(Label, { children: [
@@ -287,8 +314,16 @@ function SignInForm() {
               /* @__PURE__ */ jsx(
                 Input,
                 {
+                  name: "password",
                   type: showPassword ? "text" : "password",
-                  placeholder: "Enter your password"
+                  placeholder: "Enter your password",
+                  value: data.password,
+                  onChange: (e) => {
+                    setData(
+                      "password",
+                      e.target.value
+                    );
+                  }
                 }
               ),
               /* @__PURE__ */ jsx(
@@ -315,13 +350,21 @@ function SignInForm() {
             /* @__PURE__ */ jsx(
               Link,
               {
-                href: "/reset-password",
+                href: "/auth/reset-password",
                 className: "text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400",
                 children: "Forgot password?"
               }
             )
           ] }),
-          /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx(Button, { className: "w-full", size: "sm", children: "Sign in" }) })
+          /* @__PURE__ */ jsx("div", { children: /* @__PURE__ */ jsx(
+            Button,
+            {
+              className: "w-full",
+              size: "sm",
+              disabled: disableButton,
+              children: "Sign in"
+            }
+          ) })
         ] }) }),
         /* @__PURE__ */ jsx("div", { className: "mt-5", children: /* @__PURE__ */ jsxs("p", { className: "text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start", children: [
           "Don't have an account? ",
@@ -329,7 +372,7 @@ function SignInForm() {
           /* @__PURE__ */ jsx(
             Link,
             {
-              href: "/signup",
+              href: "/auth/signup",
               className: "text-brand-500 hover:text-brand-600 dark:text-brand-400",
               children: "Sign Up"
             }
@@ -398,7 +441,7 @@ const ThemeTogglerTwo = () => {
 function AuthLayout({ children }) {
   return /* @__PURE__ */ jsx("div", { className: "relative p-6 bg-white z-1 dark:bg-gray-900 sm:p-0", children: /* @__PURE__ */ jsxs("div", { className: "relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0", children: [
     children,
-    /* @__PURE__ */ jsx("div", { className: "items-center hidden w-full h-full lg:w-1/2 bg-brand-950 dark:bg-white/5 lg:grid", children: /* @__PURE__ */ jsxs("div", { className: "relative flex items-center justify-center z-1", children: [
+    /* @__PURE__ */ jsx("div", { className: "items-center w-full h-full lg:w-1/2 bg-brand-950 dark:bg-white/5 hidden", children: /* @__PURE__ */ jsxs("div", { className: "relative flex items-center justify-center z-1", children: [
       /* @__PURE__ */ jsx(GridShape, {}),
       /* @__PURE__ */ jsxs("div", { className: "flex flex-col items-center max-w-xs", children: [
         /* @__PURE__ */ jsx(Link, { href: "/", className: "block mb-4", children: /* @__PURE__ */ jsx(
@@ -418,8 +461,11 @@ function AuthLayout({ children }) {
 }
 function Login() {
   return /* @__PURE__ */ jsxs(Fragment, { children: [
-    /* @__PURE__ */ jsx(Head, { title: "Signin" }),
-    /* @__PURE__ */ jsx(AuthLayout, { children: /* @__PURE__ */ jsx(SignInForm, {}) })
+    /* @__PURE__ */ jsxs(Head, { children: [
+      /* @__PURE__ */ jsx("title", { children: "Signin" }),
+      /* @__PURE__ */ jsx("meta", { name: "description", content: "Access your account to manage appointments, prescriptions, and more." })
+    ] }),
+    /* @__PURE__ */ jsx(AuthLayout, { children: /* @__PURE__ */ jsx(SignInForm, { canResetPassword: true, status: "heh" }) })
   ] });
 }
 export {

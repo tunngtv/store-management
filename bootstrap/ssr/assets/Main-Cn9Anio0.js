@@ -34,6 +34,7 @@ const SidebarProvider = ({
   const [activeItem, setActiveItem] = useState(null);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const handleResize = () => {
       const mobile = window.innerWidth < 768;
       setIsMobile(mobile);

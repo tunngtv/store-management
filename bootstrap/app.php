@@ -3,10 +3,10 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Http\Request;
+// use Illuminate\Auth\AuthenticationException;
+// use Illuminate\Http\Request;
 
-use App\Http\Middleware\Authenticated;
+use App\Http\Middleware\CheckSessionTimeout;
 use App\Http\Middleware\HandleInertiaRequests;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -19,8 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->web(append: [
+            CheckSessionTimeout::class,
             HandleInertiaRequests::class,
         ]);
+
+        $middleware->redirectGuestsTo(fn() => route('signin.create'));
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // $exceptions->render(function (AuthenticationException $e, Request $request) {
